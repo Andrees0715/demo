@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="es" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Oficial de Votación Electrónica 2026</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: '#3b82f6',
+                            purple: '#8b5cf6',
+                            cyan: '#06b6d4',
+                            pink: '#ec4899',
+                            gold: '#f59e0b',
+                            dark: '#0b0f19'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'Montserrat', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-glow': 'pulseGlow 2s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'card-pop': 'cardPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                        'ballot-drop': 'ballotDrop 1s ease-in-out forwards',
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 15px rgba(59, 130, 246, 0.5)' },
+                            '50%': { boxShadow: '0 0 30px rgba(139, 92, 246, 0.8)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-12px)' },
+                        },
+                        cardPop: {
+                            '0%': { transform: 'scale(0.95)', opacity: '0.8' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
+                        },
+                        ballotDrop: {
+                            '0%': { transform: 'translateY(-100px) scale(0.8)', opacity: '0' },
+                            '50%': { transform: 'translateY(20px) scale(1.05)', opacity: '1' },
+                            '100%': { transform: 'translateY(0) scale(1)', opacity: '1' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        body {
+            background-color: #070a12;
+            color: #f3f4f6;
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism custom rules */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-panel-active {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 35px rgba(59, 130, 246, 0.25);
+        }
+
+        .glass-card-b {
+            background: rgba(24, 16, 43, 0.65);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(236, 72, 153, 0.15);
+        }
+
+        .glass-card-b-active {
+            background: rgba(39, 21, 68, 0.85);
+            border: 1px solid rgba(236, 72, 153, 0.6);
+            box-shadow: 0 0 35px rgba(236, 72, 153, 0.25);
+        }
+
+        .glass-nulo-active {
+            background: rgba(45, 35, 20, 0.85);
+            border: 1px solid rgba(245, 158, 11, 0.6);
+            box-shadow: 0 0 35px rgba(245, 158, 11, 0.25);
+        }
+
+        /* Ambient gradient background circles */
+        .ambient-bg-1 {
+            position: fixed;
+            top: -10%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(59,130,246,0.18) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .ambient-bg-2 {
+            position: fixed;
+            bottom: -10%;
+            right: -10%;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, rgba(139,92,246,0.18) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .ambient-bg-3 {
+            position: fixed;
+            top: 40%;
+            right: 25%;
+            width: 35vw;
+            height: 35vw;
+            background: radial-gradient(circle, rgba(236,72,153,0.12) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f293d;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3b82f6;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-brand-purple selection:text-white relative">
+
+    <div class="ambient-bg-1 animate-float"></div>
+    <div class="ambient-bg-2 animate-float" style="animation-delay: -3s;"></div>
+    <div class="ambient-bg-3 animate-float" style="animation-delay: -1.5s;"></div>
+
+    <header class="sticky top-0 z-40 border-b border-white/10 glass-panel">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <!-- Logo & Title -->
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-blue via-brand-purple to-brand-pink p-0.5 shadow-lg shadow-brand-blue/20">
+                    <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                        <i data-lucide="vote" class="w-6 h-6 text-brand-blue"></i>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="text-lg sm:text-xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">
+                            ELECCIONES 2026
+                        </h1>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 animate-pulse">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 mr-1.5"></span>
+                            EN VIVO
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-400 font-medium hidden sm:block">Sistema Oficial de Votación Electrónica Segura</p>
+                </div>
+            </div>
+
+            <!-- View Switcher Tabs -->
+            <div class="flex items-center bg-slate-900/80 p-1.5 rounded-2xl border border-white/10 shadow-inner">
+                <button id="tab-ballot" onclick="switchTab('ballot')" class="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 bg-gradient-to-r from-brand-blue to-brand-purple text-white shadow-md">
+                    <i data-lucide="file-check" class="w-4 h-4"></i>
+                    <span>Papeleta Digital</span>
+                </button>
+                <button id="tab-results" onclick="switchTab('results')" class="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-400 hover:text-white transition-all duration-300">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                    <span>Resultados en Vivo</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+
+        <!-- ==================== VIEW 1: BALLOT (PAPELETA DE VOTACION) ==================== -->
+        <section id="view-ballot" class="space-y-8 animate-card-pop">
+            
+            <!-- Instructions Banner -->
+            <div class="glass-panel rounded-3xl p-6 border-l-4 border-l-brand-blue relative overflow-hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center space-x-2 text-brand-blue text-xs font-bold tracking-wider uppercase mb-1">
+                            <i data-lucide="shield-check" class="w-4 h-4"></i>
+                            <span>Proceso de Votación Encriptado y Anónimo</span>
+                        </div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-white">Seleccione su preferencia electoral</h2>
+                        <p class="text-sm text-slate-300 mt-1">Haga clic sobre la lista o alternativa de su preferencia para seleccionar su voto y presione el botón de emisión.</p>
+                    </div>
+                    <div class="flex items-center space-x-2 bg-slate-900/60 px-4 py-2.5 rounded-2xl border border-white/5 self-start md:self-auto">
+                        <i data-lucide="clock" class="w-4 h-4 text-brand-purple"></i>
+                        <span class="text-xs text-slate-400">Cierre de mesas: <strong class="text-slate-200" id="clock-timer">18:00:00</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- LISTA A CARD -->
+                <div id="card-listaA" onclick="selectOption('listaA')" 
+                     class="glass-panel group rounded-3xl p-6 cursor-pointer border transition-all duration-300 hover:scale-[1.02] relative overflow-hidden flex flex-col justify-between">
+                    
+                    <!-- Top Ribbon/Badge -->
+                    <div class="flex items-center justify-between mb-6">
+                        <span class="px-3.5 py-1.5 rounded-xl bg-brand-blue/20 text-brand-blue text-xs font-bold tracking-wider border border-brand-blue/30 uppercase">
+                            LISTA A
+                        </span>
+                        <div class="radio-indicator w-7 h-7 rounded-full border-2 border-slate-600 flex items-center justify-center transition-all duration-300">
+                            <i data-lucide="check" class="w-4 h-4 text-slate-950 opacity-0 transition-opacity"></i>
+                        </div>
+                    </div>
+
+                    <!-- Party Info -->
+                    <div>
+                        <div class="mb-4">
+                            <h3 class="text-2xl font-black text-white group-hover:text-brand-blue transition-colors">
+                                Innovación y Progreso
+                            </h3>
+                            <p class="text-xs text-slate-400 italic mt-1">
+                                "Transformando el presente hacia un futuro digital sostenible"
+                            </p>
+                        </div>
+
+                        <!-- Candidates avatars & titles -->
+                        <div class="space-y-4 my-6 bg-slate-900/40 p-4 rounded-2xl border border-white/5">
+                            <!-- President Candidate -->
+                            <div class="flex items-center space-x-3.5">
+                                <img src="Capibara.jpg" 
+                                     alt="Sofía Martínez" 
+                                     class="w-14 h-14 rounded-2xl object-cover border-2 border-brand-blue/50 shadow-md">
+                                <div>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-brand-blue bg-brand-blue/10 px-2 py-0.5 rounded-md">Presidenta</span>
+                                    <h4 class="text-sm font-bold text-white mt-0.5">Dra. Sofía Martínez</h4>
+                                    <p class="text-xs text-slate-400">Ingeniera en I.A. & Master en Economía</p>
+                                </div>
+                            </div>
+                            
+                            <hr class="border-white/5">
+
+                            <!-- Vice President Candidate -->
+                            <div class="flex items-center space-x-3.5">
+                                <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=200" 
+                                     alt="Mateo Benítez" 
+                                     class="w-12 h-12 rounded-2xl object-cover border-2 border-slate-700">
+                                <div>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-800 px-2 py-0.5 rounded-md">Vicepresidente</span>
+                                    <h4 class="text-xs font-semibold text-slate-200 mt-0.5">Ing. Mateo Benítez</h4>
+                                    <p class="text-[11px] text-slate-400">Especialista en Energías Limpias</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Proposals Modal Launcher Button -->
+                    <button type="button" onclick="openProposalsModal(event, 'listaA')" 
+                            class="w-full mt-4 py-2.5 px-4 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold text-slate-300 hover:text-white flex items-center justify-center space-x-2 transition-colors border border-white/5">
+                        <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                        <span>Ver Propuestas de Campaña</span>
+                    </button>
+                </div>
+
+                <!-- LISTA B CARD -->
+                <div id="card-listaB" onclick="selectOption('listaB')" 
+                     class="glass-card-b group rounded-3xl p-6 cursor-pointer border transition-all duration-300 hover:scale-[1.02] relative overflow-hidden flex flex-col justify-between">
+                    
+                    <!-- Top Ribbon/Badge -->
+                    <div class="flex items-center justify-between mb-6">
+                        <span class="px-3.5 py-1.5 rounded-xl bg-brand-pink/20 text-brand-pink text-xs font-bold tracking-wider border border-brand-pink/30 uppercase">
+                            LISTA B
+                        </span>
+                        <div class="radio-indicator w-7 h-7 rounded-full border-2 border-slate-600 flex items-center justify-center transition-all duration-300">
+                            <i data-lucide="check" class="w-4 h-4 text-slate-950 opacity-0 transition-opacity"></i>
+                        </div>
+                    </div>
+
+                    <!-- Party Info -->
+                    <div>
+                        <div class="mb-4">
+                            <h3 class="text-2xl font-black text-white group-hover:text-brand-pink transition-colors">
+                                Futuro y Acción
+                            </h3>
+                            <p class="text-xs text-slate-400 italic mt-1">
+                                "Acción firme, gestión transparente y desarrollo social real"
+                            </p>
+                        </div>
+
+                        <!-- Candidates avatars & titles -->
+                        <div class="space-y-4 my-6 bg-slate-950/40 p-4 rounded-2xl border border-white/5">
+                            <!-- President Candidate -->
+                            <div class="flex items-center space-x-3.5">
+                                <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=200" 
+                                     alt="Camila Morales" 
+                                     class="w-14 h-14 rounded-2xl object-cover border-2 border-brand-pink/50 shadow-md">
+                                <div>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-brand-pink bg-brand-pink/10 px-2 py-0.5 rounded-md">Presidenta</span>
+                                    <h4 class="text-sm font-bold text-white mt-0.5">Dra. Camila Morales</h4>
+                                    <p class="text-xs text-slate-400">Abogada Constitucionalista & Líder Social</p>
+                                </div>
+                            </div>
+                            
+                            <hr class="border-white/5">
+
+                            <!-- Vice President Candidate -->
+                            <div class="flex items-center space-x-3.5">
+                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200" 
+                                     alt="Alejandro Torres" 
+                                     class="w-12 h-12 rounded-2xl object-cover border-2 border-slate-700">
+                                <div>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-800 px-2 py-0.5 rounded-md">Vicepresidente</span>
+                                    <h4 class="text-xs font-semibold text-slate-200 mt-0.5">Mgtr. Alejandro Torres</h4>
+                                    <p class="text-[11px] text-slate-400">Economista & Docente Universitario</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Proposals Modal Launcher Button -->
+                    <button type="button" onclick="openProposalsModal(event, 'listaB')" 
+                            class="w-full mt-4 py-2.5 px-4 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-xs font-semibold text-slate-300 hover:text-white flex items-center justify-center space-x-2 transition-colors border border-white/5">
+                        <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                        <span>Ver Propuestas de Campaña</span>
+                    </button>
+                </div>
+
+                <!-- VOTO NULO / BLANCO CARD -->
+                <div id="card-nulo" onclick="selectOption('nulo')" 
+                     class="glass-panel group rounded-3xl p-6 cursor-pointer border transition-all duration-300 hover:scale-[1.02] relative overflow-hidden flex flex-col justify-between hover:border-amber-500/40">
+                    
+                    <!-- Top Ribbon/Badge -->
+                    <div class="flex items-center justify-between mb-6">
+                        <span class="px-3.5 py-1.5 rounded-xl bg-amber-500/10 text-amber-400 text-xs font-bold tracking-wider border border-amber-500/30 uppercase">
+                            OPCIÓN NEUTRA
+                        </span>
+                        <div class="radio-indicator w-7 h-7 rounded-full border-2 border-slate-600 flex items-center justify-center transition-all duration-300">
+                            <i data-lucide="check" class="w-4 h-4 text-slate-950 opacity-0 transition-opacity"></i>
+                        </div>
+                    </div>
+
+                    <div class="my-auto py-8 text-center">
+                        <div class="w-20 h-20 mx-auto mb-5 rounded-3xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i data-lucide="ban" class="w-10 h-10 text-amber-400"></i>
+                        </div>
+                        <h3 class="text-2xl font-black text-white group-hover:text-amber-400 transition-colors">
+                            Voto Nulo / Blanco
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-2 max-w-xs mx-auto">
+                            Marque esta opción si decide no otorgar su voto a ninguna de las listas presentadas en esta contienda electoral.
+                        </p>
+                    </div>
+
+                    <div class="p-3 bg-amber-500/5 rounded-2xl border border-amber-500/10 text-center">
+                        <span class="text-[11px] text-amber-300/80 font-medium">Opción constitucional garantizada</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Bottom Floating Action Bar -->
+            <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 glass-panel p-6 rounded-3xl border border-white/10 shadow-2xl">
+                <div class="flex items-center space-x-3 text-sm text-slate-300">
+                    <div class="w-3 h-3 rounded-full bg-slate-600" id="selection-status-dot"></div>
+                    <span id="selection-status-text" class="font-medium">Selección actual: <strong class="text-slate-400">Ninguna opción elegida</strong></span>
+                </div>
+
+                <button id="btn-submit-vote" onclick="openConfirmationModal()" disabled 
+                        class="w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-sm text-slate-500 bg-slate-800 cursor-not-allowed transition-all duration-300 shadow-lg flex items-center justify-center space-x-3">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                    <span>Emitir Voto Seguro</span>
+                </button>
+            </div>
+
+        </section>
+
+
+        <!-- ==================== VIEW 2: RESULTS DASHBOARD (RESULTADOS) ==================== -->
+        <section id="view-results" class="hidden space-y-8 animate-card-pop">
+            
+            <!-- Dashboard Top KPIs -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <div class="glass-panel p-5 rounded-3xl border border-white/5">
+                    <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                        <span>Total Votos Registrados</span>
+                        <i data-lucide="users" class="w-4 h-4 text-brand-blue"></i>
+                    </div>
+                    <div class="text-3xl font-black text-white" id="kpi-total-votes">0</div>
+                    <span class="text-[11px] text-emerald-400 font-medium mt-1 inline-block">100% de Escrutinio verificado</span>
+                </div>
+
+                <div class="glass-panel p-5 rounded-3xl border border-white/5">
+                    <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                        <span>Lista A (Innovación)</span>
+                        <i data-lucide="award" class="w-4 h-4 text-brand-blue"></i>
+                    </div>
+                    <div class="text-3xl font-black text-brand-blue" id="kpi-votes-listaA">0</div>
+                    <span class="text-xs text-slate-400" id="kpi-percent-listaA">0% del total</span>
+                </div>
+
+                <div class="glass-panel p-5 rounded-3xl border border-white/5">
+                    <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                        <span>Lista B (Futuro)</span>
+                        <i data-lucide="award" class="w-4 h-4 text-brand-pink"></i>
+                    </div>
+                    <div class="text-3xl font-black text-brand-pink" id="kpi-votes-listaB">0</div>
+                    <span class="text-xs text-slate-400" id="kpi-percent-listaB">0% del total</span>
+                </div>
+
+                <div class="glass-panel p-5 rounded-3xl border border-white/5">
+                    <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                        <span>Votos Nulos/Blancos</span>
+                        <i data-lucide="slash" class="w-4 h-4 text-amber-400"></i>
+                    </div>
+                    <div class="text-3xl font-black text-amber-400" id="kpi-votes-nulo">0</div>
+                    <span class="text-xs text-slate-400" id="kpi-percent-nulo">0% del total</span>
+                </div>
+
+            </div>
+
+            <!-- Main Analytics & Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Chart Container (2 cols) -->
+                <div class="lg:col-span-2 glass-panel p-6 rounded-3xl border border-white/10 flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-white">Evolución y Distribución del Sufragio</h3>
+                            <p class="text-xs text-slate-400">Gráfico comparativo oficial en tiempo real</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-brand-purple/20 text-brand-purple border border-brand-purple/30">
+                            Cómputo Automático
+                        </span>
+                    </div>
+
+                    <div class="relative w-full h-72 sm:h-80 flex items-center justify-center">
+                        <canvas id="resultsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Detailed Breakdown Progress Bars -->
+                <div class="glass-panel p-6 rounded-3xl border border-white/10 flex flex-col justify-between space-y-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-white mb-1">Desglose Detallado</h3>
+                        <p class="text-xs text-slate-400">Estado de participación porcentual</p>
+                    </div>
+
+                    <!-- Progress Bar 1: Lista A -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-semibold">
+                            <span class="text-brand-blue flex items-center"><i data-lucide="circle-dot" class="w-3 h-3 mr-1.5"></i> Lista A (Innovación y Progreso)</span>
+                            <span id="prog-text-listaA" class="text-white">0%</span>
+                        </div>
+                        <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden p-0.5 border border-white/5">
+                            <div id="prog-bar-listaA" class="h-full bg-gradient-to-r from-blue-600 to-cyan-400 rounded-full transition-all duration-700 w-0"></div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar 2: Lista B -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-semibold">
+                            <span class="text-brand-pink flex items-center"><i data-lucide="circle-dot" class="w-3 h-3 mr-1.5"></i> Lista B (Futuro y Acción)</span>
+                            <span id="prog-text-listaB" class="text-white">0%</span>
+                        </div>
+                        <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden p-0.5 border border-white/5">
+                            <div id="prog-bar-listaB" class="h-full bg-gradient-to-r from-purple-600 to-pink-500 rounded-full transition-all duration-700 w-0"></div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar 3: Nulo -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-semibold">
+                            <span class="text-amber-400 flex items-center"><i data-lucide="circle-dot" class="w-3 h-3 mr-1.5"></i> Votos Nulos / Blancos</span>
+                            <span id="prog-text-nulo" class="text-white">0%</span>
+                        </div>
+                        <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden p-0.5 border border-white/5">
+                            <div id="prog-bar-nulo" class="h-full bg-gradient-to-r from-amber-600 to-yellow-400 rounded-full transition-all duration-700 w-0"></div>
+                        </div>
+                    </div>
+
+                    <!-- Controls for Demo & Reset -->
+                    <div class="pt-4 border-t border-white/5 flex gap-3">
+                        <button onclick="simulateVotes()" class="flex-1 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 hover:text-white transition-colors flex items-center justify-center space-x-1.5">
+                            <i data-lucide="dices" class="w-3.5 h-3.5"></i>
+                            <span>Simular Votos</span>
+                        </button>
+                        <button onclick="resetVotes()" class="py-2.5 px-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-xs font-semibold text-red-400 border border-red-500/20 transition-colors flex items-center justify-center space-x-1.5">
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                            <span>Reiniciar</span>
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- ==================== PROPOSALS MODAL ==================== -->
+    <div id="modal-proposals" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="glass-panel w-full max-w-xl rounded-3xl p-6 sm:p-8 border border-white/10 shadow-2xl scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto" id="modal-proposals-card">
+            
+            <div class="flex items-center justify-between pb-4 border-b border-white/10">
+                <div class="flex items-center space-x-3">
+                    <span id="prop-modal-tag" class="px-3 py-1 rounded-xl text-xs font-bold uppercase"></span>
+                    <h3 id="prop-modal-title" class="text-xl font-bold text-white"></h3>
+                </div>
+                <button onclick="closeProposalsModal()" class="w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="py-6 space-y-4" id="prop-modal-content">
+                <!-- Injected via JavaScript -->
+            </div>
+
+            <div class="pt-4 border-t border-white/10 text-right">
+                <button onclick="closeProposalsModal()" class="px-6 py-2.5 rounded-xl bg-brand-blue hover:bg-blue-600 font-semibold text-sm text-white transition-colors">
+                    Entendido
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ==================== CONFIRMATION MODAL ==================== -->
+    <div id="modal-confirm" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-lg opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-8 border border-white/15 shadow-2xl scale-95 transition-transform duration-300 relative overflow-hidden" id="modal-confirm-card">
+            
+            <div class="text-center space-y-4">
+                <div class="w-16 h-16 rounded-3xl bg-brand-blue/20 border border-brand-blue/40 flex items-center justify-center mx-auto">
+                    <i data-lucide="shield-alert" class="w-8 h-8 text-brand-blue animate-pulse"></i>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-black text-white">Confirmación de Voto</h3>
+                    <p class="text-xs text-slate-400 mt-1">Por favor, revise su decisión antes de emitir el sufragio definitivo.</p>
+                </div>
+
+                <!-- Preview of chosen candidate -->
+                <div class="p-4 rounded-2xl bg-slate-900/90 border border-white/10 text-left space-y-2" id="confirm-selection-summary">
+                    <!-- Injected dynamically -->
+                </div>
+
+                <div class="bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl text-left flex items-start space-x-2.5">
+                    <i data-lucide="alert-circle" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i>
+                    <p class="text-[11px] text-amber-300/90">Una vez confirmado, su voto se encriptará de manera irreversible en la urna digital.</p>
+                </div>
+
+                <!-- Actions -->
+                <div class="grid grid-cols-2 gap-3 pt-2">
+                    <button onclick="closeConfirmationModal()" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition-colors">
+                        Cancelar
+                    </button>
+                    <button onclick="executeFinalVote()" class="py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-xs font-extrabold text-slate-950 transition-all shadow-lg shadow-emerald-500/20">
+                        Confirmar y Enviar
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ==================== SUCCESS VOTE SUCCESS ANIMATION OVERLAY ==================== -->
+    <div id="modal-success" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-xl opacity-0 pointer-events-none transition-opacity duration-500">
+        <div class="glass-panel w-full max-w-lg rounded-3xl p-8 border border-emerald-500/30 text-center space-y-6 shadow-[0_0_50px_rgba(16,185,129,0.2)]">
+            
+            <!-- Digital Ballot Drop Animation Container -->
+            <div class="relative w-24 h-24 mx-auto">
+                <div class="w-full h-full rounded-3xl bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center animate-bounce">
+                    <i data-lucide="check-circle-2" class="w-12 h-12 text-emerald-400"></i>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <span class="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold uppercase tracking-wider border border-emerald-500/20">
+                    Voto Registrado con Éxito
+                </span>
+                <h3 class="text-2xl sm:text-3xl font-black text-white">¡Gracias por participar!</h3>
+                <p class="text-xs text-slate-300 max-w-sm mx-auto">Su papeleta digital ha sido encriptada y depositada de forma segura en la base de datos electoral.</p>
+            </div>
+
+            <!-- Receipt Card -->
+            <div class="bg-slate-900/80 p-4 rounded-2xl border border-white/10 text-left font-mono text-xs space-y-2">
+                <div class="flex justify-between text-slate-400">
+                    <span>Código Hash de Seguridad:</span>
+                    <span class="text-emerald-400 font-bold" id="receipt-hash">0x8F...3A92</span>
+                </div>
+                <div class="flex justify-between text-slate-400">
+                    <span>Estampa de Tiempo:</span>
+                    <span class="text-slate-200" id="receipt-time">--:--:--</span>
+                </div>
+                <div class="flex justify-between text-slate-400">
+                    <span>Estado:</span>
+                    <span class="text-emerald-400 font-semibold">VERIFICADO ✓</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                <button onclick="finishVotingProcess('results')" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-brand-blue to-brand-purple text-xs font-bold text-white shadow-lg transition-transform hover:scale-[1.02]">
+                    Ver Resultados en Vivo
+                </button>
+                <button onclick="finishVotingProcess('ballot')" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition-colors">
+                    Nuevo Voto (Demo)
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+
+    <footer class="border-t border-white/10 py-6 glass-panel mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+            <div class="flex items-center space-x-2">
+                <i data-lucide="shield" class="w-4 h-4 text-brand-blue"></i>
+                <span>© 2026 Consejo Nacional Electoral Digital. Plataforma de Votación Encriptada.</span>
+            </div>
+            <div class="flex space-x-6">
+                <a href="#" onclick="event.preventDefault();" class="hover:text-slate-300 transition-colors">Términos de Seguridad</a>
+                <a href="#" onclick="event.preventDefault();" class="hover:text-slate-300 transition-colors">Auditoría de Código</a>
+                <a href="#" onclick="event.preventDefault();" class="hover:text-slate-300 transition-colors">Soporte Técnico</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ==================== STATE MANAGEMENT ====================
+        let state = {
+            selectedOption: null, // 'listaA', 'listaB', or 'nulo'
+            votes: {
+                listaA: 1420,
+                listaB: 1285,
+                nulo: 195
+            },
+            chartInstance: null
+        };
+
+        // Proposals Data
+        const proposalsData = {
+            listaA: {
+                title: "Lista A - Innovación y Progreso",
+                tag: "Innovación y Progreso",
+                color: "bg-brand-blue/20 text-brand-blue border-brand-blue/30",
+                proposals: [
+                    { icon: "cpu", title: "Transformación Digital Educativa", desc: "Implementación de laboratorios de Inteligencia Artificial y conectividad satelital en el 100% de centros educativos." },
+                    { icon: "leaf", title: "Matriz Energética Limpia", desc: "Transición hacia energía solar y eólica para reducir en un 40% las emisiones urbanas en los próximos 4 años." },
+                    { icon: "briefcase", title: "Fomento al Empleo Joven", desc: "Incentivos tributarios para empresas tecnológicas e industrias limpias que contraten jóvenes profesionales." },
+                    { icon: "heart-pulse", title: "Telemedicina Nacional", desc: "Red unificada de salud digital con atención médica especialista remota las 24 horas del día." }
+                ]
+            },
+            listaB: {
+                title: "Lista B - Futuro y Acción",
+                tag: "Futuro y Acción",
+                color: "bg-brand-pink/20 text-brand-pink border-brand-pink/30",
+                proposals: [
+                    { icon: "shield-check", title: "Seguridad Ciudadana Inteligente", desc: "Modernización del sistema policial con cámaras comunitarias, drones de vigilancia y patrullaje de alta frecuencia." },
+                    { icon: "trending-up", title: "Reactivación Económica Local", desc: "Créditos a tasa cero para microempresarios, emprendedores y pequeños agricultores del país." },
+                    { icon: "scale", title: "Transparencia y Anti-Corrupción", desc: "Auditoría pública en tiempo real mediante blockchain para todos los contratos de obras públicas." },
+                    { icon: "graduation-cap", title: "Becas Universitarias Integrales", desc: "Aumento del presupuesto para becas de grado y posgrado en las mejores universidades del mundo." }
+                ]
+            }
+        };
+
+        // ==================== WEB AUDIO API SYNTHESIZER ====================
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playTone(freq, type, duration, gainVal = 0.1) {
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                
+                gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                // Fallback silently if audio context fails
+            }
+        }
+
+        function playClickSound() {
+            playTone(800, 'sine', 0.08, 0.08);
+        }
+
+        function playSelectSound() {
+            playTone(520, 'sine', 0.1, 0.12);
+            setTimeout(() => playTone(650, 'sine', 0.12, 0.12), 60);
+        }
+
+        function playSuccessSound() {
+            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+            notes.forEach((note, index) => {
+                setTimeout(() => {
+                    playTone(note, 'triangle', 0.3, 0.15);
+                }, index * 100);
+            });
+        }
+
+        // ==================== INITIALIZATION ====================
+        window.onload = function() {
+            lucide.createIcons();
+            loadLocalStorage();
+            startLiveClock();
+            initChart();
+            updateDashboardKPIs();
+        };
+
+        // Live Clock Counter
+        function startLiveClock() {
+            function updateClock() {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                const clockElem = document.getElementById('clock-timer');
+                if (clockElem) clockElem.textContent = `${hours}:${minutes}:${seconds}`;
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        // Local Storage Handler
+        function loadLocalStorage() {
+            const savedVotes = localStorage.getItem('electoral_votes_2026');
+            if (savedVotes) {
+                try {
+                    state.votes = JSON.parse(savedVotes);
+                } catch (e) {
+                    console.error("Error reading saved votes");
+                }
+            }
+        }
+
+        function saveLocalStorage() {
+            localStorage.setItem('electoral_votes_2026', JSON.stringify(state.votes));
+        }
+
+        // ==================== SELECTION LOGIC ====================
+        function selectOption(option) {
+            playSelectSound();
+            state.selectedOption = option;
+
+            // Clear active styling from all cards
+            const cards = {
+                listaA: document.getElementById('card-listaA'),
+                listaB: document.getElementById('card-listaB'),
+                nulo: document.getElementById('card-nulo')
+            };
+
+            Object.keys(cards).forEach(key => {
+                const card = cards[key];
+                const indicator = card.querySelector('.radio-indicator');
+                const checkIcon = indicator.querySelector('[data-lucide="check"]');
+
+                // Reset base classes
+                card.classList.remove('glass-panel-active', 'glass-card-b-active', 'glass-nulo-active', 'border-brand-blue', 'border-brand-pink', 'border-amber-500');
+                indicator.classList.remove('bg-brand-blue', 'border-brand-blue', 'bg-brand-pink', 'border-brand-pink', 'bg-amber-400', 'border-amber-400');
+                indicator.classList.add('border-slate-600');
+                if (checkIcon) checkIcon.classList.add('opacity-0');
+            });
+
+            // Apply specific active styling to selected card
+            const selectedCard = cards[option];
+            const selectedIndicator = selectedCard.querySelector('.radio-indicator');
+            const selectedCheck = selectedIndicator.querySelector('[data-lucide="check"]');
+
+            selectedIndicator.classList.remove('border-slate-600');
+            if (selectedCheck) selectedCheck.classList.remove('opacity-0');
+
+            const statusDot = document.getElementById('selection-status-dot');
+            const statusText = document.getElementById('selection-status-text');
+            const submitBtn = document.getElementById('btn-submit-vote');
+
+            if (option === 'listaA') {
+                selectedCard.classList.add('glass-panel-active');
+                selectedIndicator.classList.add('bg-brand-blue', 'border-brand-blue');
+                statusDot.className = 'w-3 h-3 rounded-full bg-brand-blue animate-ping';
+                statusText.innerHTML = 'Selección actual: <strong class="text-brand-blue font-bold">Lista A - Innovación y Progreso</strong>';
+            } else if (option === 'listaB') {
+                selectedCard.classList.add('glass-card-b-active');
+                selectedIndicator.classList.add('bg-brand-pink', 'border-brand-pink');
+                statusDot.className = 'w-3 h-3 rounded-full bg-brand-pink animate-ping';
+                statusText.innerHTML = 'Selección actual: <strong class="text-brand-pink font-bold">Lista B - Futuro y Acción</strong>';
+            } else if (option === 'nulo') {
+                selectedCard.classList.add('glass-nulo-active');
+                selectedIndicator.classList.add('bg-amber-400', 'border-amber-400');
+                statusDot.className = 'w-3 h-3 rounded-full bg-amber-400 animate-ping';
+                statusText.innerHTML = 'Selección actual: <strong class="text-amber-400 font-bold">Voto Nulo / Blanco</strong>';
+            }
+
+            // Enable submit button
+            submitBtn.disabled = false;
+            submitBtn.className = "w-full sm:w-auto px-8 py-4 rounded-2xl font-extrabold text-sm text-slate-950 bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500 hover:brightness-110 cursor-pointer transition-all duration-300 shadow-xl shadow-emerald-500/25 flex items-center justify-center space-x-3 animate-pulse";
+        }
+
+        // ==================== PROPOSALS MODAL LOGIC ====================
+        function openProposalsModal(event, partyKey) {
+            event.stopPropagation(); // Prevent card selection when clicking button
+            playClickSound();
+
+            const data = proposalsData[partyKey];
+            if (!data) return;
+
+            document.getElementById('prop-modal-title').textContent = data.title;
+            const tagElem = document.getElementById('prop-modal-tag');
+            tagElem.textContent = data.tag;
+            tagElem.className = `px-3 py-1 rounded-xl text-xs font-bold uppercase border ${data.color}`;
+
+            const contentElem = document.getElementById('prop-modal-content');
+            contentElem.innerHTML = data.proposals.map(p => `
+                <div class="flex items-start space-x-4 p-3.5 rounded-2xl bg-slate-900/60 border border-white/5">
+                    <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center shrink-0 text-brand-blue">
+                        <i data-lucide="${p.icon}" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-white">${p.title}</h4>
+                        <p class="text-xs text-slate-400 mt-1">${p.desc}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+
+            const modal = document.getElementById('modal-proposals');
+            const modalCard = document.getElementById('modal-proposals-card');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modalCard.classList.remove('scale-95');
+            modalCard.classList.add('scale-100');
+        }
+
+        function closeProposalsModal() {
+            playClickSound();
+            const modal = document.getElementById('modal-proposals');
+            const modalCard = document.getElementById('modal-proposals-card');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modalCard.classList.remove('scale-100');
+            modalCard.classList.add('scale-95');
+        }
+
+        // ==================== CONFIRMATION MODAL LOGIC ====================
+        function openConfirmationModal() {
+            if (!state.selectedOption) return;
+            playClickSound();
+
+            const summaryElem = document.getElementById('confirm-selection-summary');
+            
+            if (state.selectedOption === 'listaA') {
+                summaryElem.innerHTML = `
+                    <div class="text-xs font-bold text-brand-blue uppercase">Opción Seleccionada: LISTA A</div>
+                    <div class="text-base font-extrabold text-white">Innovación y Progreso</div>
+                    <div class="text-xs text-slate-300">Candidata Presidenta: Dra. Sofía Martínez</div>
+                `;
+            } else if (state.selectedOption === 'listaB') {
+                summaryElem.innerHTML = `
+                    <div class="text-xs font-bold text-brand-pink uppercase">Opción Seleccionada: LISTA B</div>
+                    <div class="text-base font-extrabold text-white">Futuro y Acción</div>
+                    <div class="text-xs text-slate-300">Candidata Presidenta: Dra. Camila Morales</div>
+                `;
+            } else {
+                summaryElem.innerHTML = `
+                    <div class="text-xs font-bold text-amber-400 uppercase">Opción Seleccionada: NEUTRA</div>
+                    <div class="text-base font-extrabold text-white">Voto Nulo / En Blanco</div>
+                    <div class="text-xs text-slate-300">Sufragio registrado sin adhesión a candidaturas.</div>
+                `;
+            }
+
+            const modal = document.getElementById('modal-confirm');
+            const modalCard = document.getElementById('modal-confirm-card');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modalCard.classList.remove('scale-95');
+            modalCard.classList.add('scale-100');
+        }
+
+        function closeConfirmationModal() {
+            playClickSound();
+            const modal = document.getElementById('modal-confirm');
+            const modalCard = document.getElementById('modal-confirm-card');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modalCard.classList.remove('scale-100');
+            modalCard.classList.add('scale-95');
+        }
+
+        // ==================== EXECUTE FINAL VOTE ====================
+        function executeFinalVote() {
+            closeConfirmationModal();
+
+            // Increment votes in state
+            state.votes[state.selectedOption]++;
+            saveLocalStorage();
+
+            // Generate cryptographic receipt simulation
+            const randomHash = '0x' + Array.from({length: 8}, () => Math.floor(Math.random()*16).toString(16)).join('').toUpperCase();
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+
+            document.getElementById('receipt-hash').textContent = randomHash;
+            document.getElementById('receipt-time').textContent = timeString;
+
+            // Trigger success chime and confetti blast
+            playSuccessSound();
+            triggerConfetti();
+
+            // Show Success Modal
+            const modalSuccess = document.getElementById('modal-success');
+            modalSuccess.classList.remove('opacity-0', 'pointer-events-none');
+
+            // Update live KPIs
+            updateDashboardKPIs();
+        }
+
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 120,
+                    spread: 80,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        function finishVotingProcess(targetTab) {
+            playClickSound();
+            const modalSuccess = document.getElementById('modal-success');
+            modalSuccess.classList.add('opacity-0', 'pointer-events-none');
+
+            // Reset current selection
+            state.selectedOption = null;
+            const submitBtn = document.getElementById('btn-submit-vote');
+            submitBtn.disabled = true;
+            submitBtn.className = "w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-sm text-slate-500 bg-slate-800 cursor-not-allowed transition-all duration-300 shadow-lg flex items-center justify-center space-x-3";
+            
+            document.getElementById('selection-status-dot').className = 'w-3 h-3 rounded-full bg-slate-600';
+            document.getElementById('selection-status-text').innerHTML = 'Selección actual: <strong class="text-slate-400">Ninguna opción elegida</strong>';
+
+            // Reset cards UI
+            ['card-listaA', 'card-listaB', 'card-nulo'].forEach(id => {
+                const card = document.getElementById(id);
+                card.classList.remove('glass-panel-active', 'glass-card-b-active', 'glass-nulo-active');
+                const indicator = card.querySelector('.radio-indicator');
+                indicator.className = 'radio-indicator w-7 h-7 rounded-full border-2 border-slate-600 flex items-center justify-center transition-all duration-300';
+                const check = indicator.querySelector('[data-lucide="check"]');
+                if (check) check.classList.add('opacity-0');
+            });
+
+            switchTab(targetTab);
+        }
+
+        // ==================== TAB NAVIGATION ====================
+        function switchTab(tab) {
+            playClickSound();
+            const viewBallot = document.getElementById('view-ballot');
+            const viewResults = document.getElementById('view-results');
+            const tabBallot = document.getElementById('tab-ballot');
+            const tabResults = document.getElementById('tab-results');
+
+            if (tab === 'ballot') {
+                viewBallot.classList.remove('hidden');
+                viewResults.classList.add('hidden');
+
+                tabBallot.className = "flex items-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 bg-gradient-to-r from-brand-blue to-brand-purple text-white shadow-md";
+                tabResults.className = "flex items-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-400 hover:text-white transition-all duration-300";
+            } else {
+                viewBallot.classList.add('hidden');
+                viewResults.classList.remove('hidden');
+
+                tabResults.className = "flex items-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 bg-gradient-to-r from-brand-blue to-brand-purple text-white shadow-md";
+                tabBallot.className = "flex items-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-400 hover:text-white transition-all duration-300";
+
+                updateDashboardKPIs();
+            }
+        }
+
+        // ==================== CHART & DASHBOARD LOGIC ====================
+        function initChart() {
+            const ctx = document.getElementById('resultsChart').getContext('2d');
+            
+            state.chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Lista A (Innovación)', 'Lista B (Futuro)', 'Voto Nulo / Blanco'],
+                    datasets: [{
+                        label: 'Número de Votos',
+                        data: [state.votes.listaA, state.votes.listaB, state.votes.nulo],
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.85)',
+                            'rgba(236, 72, 153, 0.85)',
+                            'rgba(245, 158, 11, 0.85)'
+                        ],
+                        borderColor: [
+                            '#3b82f6',
+                            '#ec4899',
+                            '#f59e0b'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 12,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleFont: { family: 'Poppins', size: 14, weight: 'bold' },
+                            bodyFont: { family: 'Poppins', size: 13 },
+                            padding: 12,
+                            borderColor: 'rgba(255,255,255,0.1)',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8', font: { family: 'Poppins', size: 11 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94a3b8', font: { family: 'Poppins', size: 11 } },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateDashboardKPIs() {
+            const total = state.votes.listaA + state.votes.listaB + state.votes.nulo;
+            
+            document.getElementById('kpi-total-votes').textContent = total.toLocaleString();
+            document.getElementById('kpi-votes-listaA').textContent = state.votes.listaA.toLocaleString();
+            document.getElementById('kpi-votes-listaB').textContent = state.votes.listaB.toLocaleString();
+            document.getElementById('kpi-votes-nulo').textContent = state.votes.nulo.toLocaleString();
+
+            const pctA = total > 0 ? ((state.votes.listaA / total) * 100).toFixed(1) : 0;
+            const pctB = total > 0 ? ((state.votes.listaB / total) * 100).toFixed(1) : 0;
+            const pctN = total > 0 ? ((state.votes.nulo / total) * 100).toFixed(1) : 0;
+
+            document.getElementById('kpi-percent-listaA').textContent = `${pctA}% del total`;
+            document.getElementById('kpi-percent-listaB').textContent = `${pctB}% del total`;
+            document.getElementById('kpi-percent-nulo').textContent = `${pctN}% del total`;
+
+            // Update Progress Bars
+            document.getElementById('prog-text-listaA').textContent = `${pctA}%`;
+            document.getElementById('prog-bar-listaA').style.width = `${pctA}%`;
+
+            document.getElementById('prog-text-listaB').textContent = `${pctB}%`;
+            document.getElementById('prog-bar-listaB').style.width = `${pctB}%`;
+
+            document.getElementById('prog-text-nulo').textContent = `${pctN}%`;
+            document.getElementById('prog-bar-nulo').style.width = `${pctN}%`;
+
+            // Update Chart.js Instance
+            if (state.chartInstance) {
+                state.chartInstance.data.datasets[0].data = [
+                    state.votes.listaA,
+                    state.votes.listaB,
+                    state.votes.nulo
+                ];
+                state.chartInstance.update();
+            }
+        }
+
+        // ==================== SIMULATION & RESET UTILITIES ====================
+        function simulateVotes() {
+            playClickSound();
+            // Add batch of random votes
+            state.votes.listaA += Math.floor(Math.random() * 45) + 10;
+            state.votes.listaB += Math.floor(Math.random() * 45) + 10;
+            state.votes.nulo += Math.floor(Math.random() * 10) + 1;
+
+            saveLocalStorage();
+            updateDashboardKPIs();
+        }
+
+        function resetVotes() {
+            playClickSound();
+            state.votes = {
+                listaA: 0,
+                listaB: 0,
+                nulo: 0
+            };
+            saveLocalStorage();
+            updateDashboardKPIs();
+        }
+    </script>
+</body>
+</html>
